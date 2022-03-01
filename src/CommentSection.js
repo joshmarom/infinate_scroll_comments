@@ -6,8 +6,8 @@ import CommentForm from './CommentForm';
 function CommentSection() {
   return (
       <Stack spacing={4}>
-          <Heading as="h3" size="md">Comments</Heading>
           <CommentForm />
+          <Heading as="h3" size="lg">Comments</Heading>
           <Comments />
       </Stack>
   );
