@@ -1,5 +1,5 @@
-import React, { useEffect, useReducer } from 'react'
-import { VStack } from '@chakra-ui/react'
+import React, { useEffect, useReducer, useCallback, useRef } from 'react'
+import { VStack, Box, Spinner } from '@chakra-ui/react'
 import Comment from "./Comment";
 
 function Comments() {
@@ -42,11 +42,28 @@ function Comments() {
                 commentsDispatch( { type: 'FETCHING_COMMENTS', fetching: false } )
                 return e
             })
-    }, [ commentsDispatch ] );
+    }, [ commentsDispatch, pager.page ] );
+
+    let endOfComments = useRef( null );
+    const scrollObserver = useCallback( node => {
+        new IntersectionObserver( entries => {
+            entries.forEach( entry => {
+                if ( entry.intersectionRatio > 0 ) pagerDispatch( { type: 'NEXT_PAGE' } )
+            } );
+        }).observe( node );
+    }, [ pagerDispatch ] );
+
+    useEffect( () => {
+        if ( endOfComments.current ) {
+            scrollObserver( endOfComments.current );
+        }
+    }, [ scrollObserver, endOfComments ] );
 
     return (
         <VStack spacing={4}>
             { commentsData.comments.map( comment => <Comment key={ comment.id } comment={ comment } /> ) }
+            { commentsData.fetching && <Spinner /> }
+            <Box ref={endOfComments}/>
         </VStack>
     )
 }
