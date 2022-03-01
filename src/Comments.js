@@ -14,10 +14,22 @@ function Comments() {
         }
     }
 
+    const pageReducer = ( state, action ) => {
+        switch ( action.type ) {
+            case 'NEXT_PAGE':
+                return { ...state, page: state.page + 1 }
+            default:
+                return state;
+        }
+    }
+
+    const [ pager, pagerDispatch ] = useReducer( pageReducer, { page: 0 } )
     const [ commentsData, commentsDispatch ] = useReducer( commentsReducer,{ comments:[], fetching: true} );
 
     useEffect(() => {
-        const apiUrl = 'https://jsonplaceholder.typicode.com/comments';
+        const startIndex = pager.page * 20;
+        const endIndex = startIndex + 20;
+        const apiUrl = `https://jsonplaceholder.typicode.com/comments?_start=${startIndex}&_end=${endIndex}`;
 
         commentsDispatch( { type: 'FETCHING_COMMENTS', fetching: true } )
 
