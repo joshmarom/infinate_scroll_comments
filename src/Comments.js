@@ -1,28 +1,9 @@
 import React, { useEffect, useReducer, useCallback, useRef } from 'react'
 import { VStack, Box, Spinner } from '@chakra-ui/react'
+import { commentsReducer, pageReducer } from './reducers'
 import Comment from "./Comment";
 
 function Comments() {
-    const commentsReducer = ( state, action ) => {
-        switch ( action.type ) {
-            case 'STACK_COMMENTS':
-                return { ...state, comments: state.comments.concat( action.comments ) }
-            case 'FETCHING_COMMENTS':
-                return { ...state, fetching: action.fetching }
-            default:
-                return state;
-        }
-    }
-
-    const pageReducer = ( state, action ) => {
-        switch ( action.type ) {
-            case 'NEXT_PAGE':
-                return { ...state, page: state.page + 1 }
-            default:
-                return state;
-        }
-    }
-
     const [ pager, pagerDispatch ] = useReducer( pageReducer, { page: 0 } )
     const [ commentsData, commentsDispatch ] = useReducer( commentsReducer,{ comments:[], fetching: true} );
 
