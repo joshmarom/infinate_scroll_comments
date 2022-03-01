@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer } from 'react'
-import {VStack, Box, HStack, Image, Heading, Text} from '@chakra-ui/react'
+import { VStack } from '@chakra-ui/react'
+import Comment from "./Comment";
 
 function Comments() {
     const commentsReducer = ( state, action ) => {
@@ -33,19 +34,7 @@ function Comments() {
 
     return (
         <VStack spacing={4}>
-            { commentsData.comments.map( comment => {
-                const { body, name, email } = comment;
-
-                return (
-                    <HStack p={8} borderWidth='1px' borderRadius='lg' spacing={8}>
-                        <Image src={`https://i.pravatar.cc/150?u=${email}`} w={16} borderRadius='full' />
-                        <Box w='full'>
-                            <Heading as="h4" size='sm' >{name}</Heading>
-                            <Text>{body}</Text>
-                        </Box>
-                    </HStack>
-                )
-            } ) }
+            { commentsData.comments.map( comment => <Comment key={ comment.id } comment={ comment } /> ) }
         </VStack>
     )
 }
