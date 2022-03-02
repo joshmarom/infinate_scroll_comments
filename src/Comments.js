@@ -1,27 +1,13 @@
 import React, { useEffect, useReducer, useCallback, useRef } from 'react'
 import { VStack, Box, Spinner } from '@chakra-ui/react'
 import { commentsReducer, pageReducer } from './reducers'
-import getComments from './commentsApi'
+import fetchComments from './fetchComments'
 import Comment from "./Comment";
 
 function Comments() {
     const [ pager, pagerDispatch ] = useReducer( pageReducer, { page: 0 } )
     const [ commentsData, commentsDispatch ] = useReducer( commentsReducer,{ comments:[], fetching: true } )
     let endOfComments = useRef( null );
-
-    useEffect(() => {
-        commentsDispatch( { type: 'FETCH_COMMENTS', fetching: true } )
-
-        getComments( pager.page, 20 )
-            .then( comments => {
-                commentsDispatch( { type: 'STACK_COMMENTS', comments } )
-                commentsDispatch( { type: 'FETCH_COMMENTS', fetching: false } )
-            })
-            .catch( error => {
-                commentsDispatch( { type: 'FETCH_COMMENTS', fetching: false } )
-                return error
-            })
-    }, [ commentsDispatch, pager ] );
 
     const scrollObserver = useCallback( node => {
         new IntersectionObserver( entries => {
@@ -32,10 +18,20 @@ function Comments() {
         }).observe( node );
     }, [ pagerDispatch ] );
 
-    useEffect( () => {
+    useEffect(() => {
+        fetchComments( pager.page ).then( comments => {
+                commentsDispatch( { type: 'STACK_COMMENTS', comments } )
+            }).catch( e => {
+                console.log( e )
+            }).finally( () => {
+                commentsDispatch( { type: 'FETCHING_COMMENTS', fetching: false } )
+            })
+    }, [ commentsDispatch, pager.page ] );
+
+    useEffect(() => {
         if ( ! endOfComments.current ) return
         scrollObserver( endOfComments.current )
-    }, [ scrollObserver, endOfComments ] );
+    }, [ scrollObserver, endOfComments ] )
 
     return (
         <VStack spacing={4}>
