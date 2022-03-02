@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { VStack, Box, Spinner } from '@chakra-ui/react'
 import fetchComments from './fetchComments'
 import Comment from './Comment';
