@@ -2,21 +2,14 @@ import React, { useEffect, useCallback, useRef, useState } from 'react'
 import { VStack, Box, Spinner } from '@chakra-ui/react'
 import fetchComments from './fetchComments'
 import Comment from './Comment';
+import useIntersectionObserver from '@react-hook/intersection-observer'
 
 function Comments() {
     const [ comments, setComments ] = useState([]);
     const [ loading, setLoading ] = useState(true);
     const [ page, setPage ] = useState(0);
     let endOfComments = useRef( null );
-
-    const scrollObserver = useCallback( node => {
-        new IntersectionObserver( entries => {
-            entries.forEach( entry => {
-                if ( entry.intersectionRatio <= 0 ) return
-                pagerDispatch( { type: 'NEXT_PAGE' } )
-            } );
-        }).observe( node );
-    }, [ pagerDispatch ] );
+    const { isIntersecting } = useIntersectionObserver( endOfComments );
 
     useEffect(() => {
         fetchComments( page )
@@ -26,9 +19,11 @@ function Comments() {
     }, [page]);
 
     useEffect(() => {
-        if ( ! endOfComments.current ) return
-        scrollObserver( endOfComments.current )
-    }, [ scrollObserver, endOfComments ] )
+        if ( isIntersecting ) {
+            setPage( page => page + 1 )
+            setLoading(true)
+        }
+    }, [isIntersecting] )
 
     return (
         <VStack spacing={4}>
