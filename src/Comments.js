@@ -1,43 +1,40 @@
 import React, { useEffect, useReducer, useCallback, useRef } from 'react'
 import { VStack, Box, Spinner } from '@chakra-ui/react'
 import { commentsReducer, pageReducer } from './reducers'
+import getComments from './commentsApi'
 import Comment from "./Comment";
 
-function Comments() {
+function Comments({ perPage = 20 }) {
     const [ pager, pagerDispatch ] = useReducer( pageReducer, { page: 0 } )
-    const [ commentsData, commentsDispatch ] = useReducer( commentsReducer,{ comments:[], fetching: true} );
+    const [ commentsData, commentsDispatch ] = useReducer( commentsReducer,{ comments:[], fetching: true } )
+    let endOfComments = useRef( null );
 
     useEffect(() => {
-        const startIndex = pager.page * 20;
-        const endIndex = startIndex + 20;
-        const apiUrl = `https://jsonplaceholder.typicode.com/comments?_start=${startIndex}&_end=${endIndex}`;
+        commentsDispatch( { type: 'FETCH_COMMENTS', fetching: true } )
 
-        commentsDispatch( { type: 'FETCHING_COMMENTS', fetching: true } )
-
-        fetch( apiUrl ).then( data => data.json() )
+        getComments( pager.page, perPage )
             .then( comments => {
                 commentsDispatch( { type: 'STACK_COMMENTS', comments } )
-                commentsDispatch( { type: 'FETCHING_COMMENTS', fetching: false } )
+                commentsDispatch( { type: 'FETCH_COMMENTS', fetching: false } )
             })
-            .catch( e => {
-                commentsDispatch( { type: 'FETCHING_COMMENTS', fetching: false } )
-                return e
+            .catch( error => {
+                commentsDispatch( { type: 'FETCH_COMMENTS', fetching: false } )
+                return error
             })
-    }, [ commentsDispatch, pager.page ] );
+    }, [ commentsDispatch, pager ] );
 
-    let endOfComments = useRef( null );
     const scrollObserver = useCallback( node => {
         new IntersectionObserver( entries => {
             entries.forEach( entry => {
-                if ( entry.intersectionRatio > 0 ) pagerDispatch( { type: 'NEXT_PAGE' } )
+                if ( entry.intersectionRatio <= 0 ) return
+                pagerDispatch( { type: 'NEXT_PAGE' } )
             } );
         }).observe( node );
     }, [ pagerDispatch ] );
 
     useEffect( () => {
-        if ( endOfComments.current ) {
-            scrollObserver( endOfComments.current );
-        }
+        if ( ! endOfComments.current ) return
+        scrollObserver( endOfComments.current )
     }, [ scrollObserver, endOfComments ] );
 
     return (
