@@ -13,7 +13,7 @@ function Comments() {
 
     useEffect(() => {
         fetchComments( page )
-            .then( moreComments => setComments( [...comments, ...moreComments] ) )
+            .then( moreComments => setComments( c => [...c, ...moreComments] ) )
             .catch( e => console.log( e ) )
             .finally( () => setLoading( false ) )
     }, [page]);
