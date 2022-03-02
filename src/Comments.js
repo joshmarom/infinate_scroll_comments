@@ -4,7 +4,7 @@ import { commentsReducer, pageReducer } from './reducers'
 import getComments from './commentsApi'
 import Comment from "./Comment";
 
-function Comments({ perPage = 20 }) {
+function Comments() {
     const [ pager, pagerDispatch ] = useReducer( pageReducer, { page: 0 } )
     const [ commentsData, commentsDispatch ] = useReducer( commentsReducer,{ comments:[], fetching: true } )
     let endOfComments = useRef( null );
@@ -12,7 +12,7 @@ function Comments({ perPage = 20 }) {
     useEffect(() => {
         commentsDispatch( { type: 'FETCH_COMMENTS', fetching: true } )
 
-        getComments( pager.page, perPage )
+        getComments( pager.page, 20 )
             .then( comments => {
                 commentsDispatch( { type: 'STACK_COMMENTS', comments } )
                 commentsDispatch( { type: 'FETCH_COMMENTS', fetching: false } )
