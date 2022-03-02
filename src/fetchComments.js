@@ -1,4 +1,4 @@
-const fetchComments = (page, perPage = 20 ) => {
+const fetchComments = ( page = 0, perPage = 20 ) => {
     const apiUrl = 'https://jsonplaceholder.typicode.com/comments';
     const startIndex = page * perPage;
     const endIndex = startIndex + perPage;
