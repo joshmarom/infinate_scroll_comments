@@ -2,7 +2,7 @@ export const commentsReducer = ( state, action ) => {
     switch ( action.type ) {
         case 'STACK_COMMENTS':
             return { ...state, comments: state.comments.concat( action.comments ) }
-        case 'FETCHING_COMMENTS':
+        case 'FETCH_COMMENTS':
             return { ...state, fetching: action.fetching }
         default:
             return state;
